@@ -2,8 +2,24 @@ import React from "react";
 import PropTypes from "prop-types";
 import data from "./data/usa-map-dimensions";
 import USAState from "./components/USAState";
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
+
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 220,
+    fontSize: theme.typography.pxToRem(12),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
 
 class USAMap extends React.Component {
+
+  
 
   clickHandler = (stateAbbreviation) => {
     this.props.onClick(stateAbbreviation);
@@ -28,8 +44,20 @@ class USAMap extends React.Component {
     let paths = [];
     let dataStates = data();
     for (let stateKey in dataStates) {
-      const path = <USAState key={stateKey} stateName={dataStates[stateKey].name} dimensions={dataStates[stateKey]["dimensions"]} state={stateKey} fill={this.fillStateColor(stateKey)} onClickState={this.stateClickHandler(stateKey)} />
-      paths.push(path);
+        const path = (
+          <HtmlTooltip
+          title={
+            <React.Fragment>
+              <Typography color="inherit">Tooltip with HTML</Typography>
+              <em>{"And here's"}</em> <b>{'some'}</b> <u>{'amazing content'}</u>.{' '}
+              {"It's very engaging. Right?"}
+            </React.Fragment>
+          }
+        >
+            <USAState key={stateKey} stateName={dataStates[stateKey].name} dimensions={dataStates[stateKey]["dimensions"]} state={stateKey} fill={this.fillStateColor(stateKey)} onClickState={this.stateClickHandler(stateKey)} />
+          </HtmlTooltip>
+        )
+        paths.push(path);
     };
     return paths;
   };
@@ -37,7 +65,6 @@ class USAMap extends React.Component {
   render() {
     return (
       <svg className="us-state-map" xmlns="http://www.w3.org/2000/svg" width={this.props.width} height={this.props.height} viewBox="0 0 959 593">
-        <title>{this.props.title}</title>
         <g className="outlines">
           {this.buildPaths()}
           <g className="DC state">
@@ -54,7 +81,6 @@ USAMap.propTypes = {
   onClick: PropTypes.func.isRequired,
   width: PropTypes.number,
   height: PropTypes.number,
-  title: PropTypes.string,
   defaultFill: PropTypes.string,
   customize: PropTypes.object
 };
@@ -64,7 +90,6 @@ USAMap.defaultProps = {
   width: 959,
   height: 593,
   defaultFill: "#D3D3D3",
-  title: "Blank US states map",
   customize: {}
 };
 
